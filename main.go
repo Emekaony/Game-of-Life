@@ -3,15 +3,28 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"os"
+	"os/exec"
 	"strings"
+	"time"
 )
 
+func Clear_Console() {
+	cmd := exec.Command("clear")
+	cmd.Stdout = os.Stdout
+	cmd.Run()
+}
 func Random_State(width, height int) [][]int {
 	result := [][]int{}
+	random_threshold := 0.1
 	for i := 0; i < height; i++ {
 		temp := make([]int, width)
 		for idx := range temp {
-			temp[idx] = rand.Intn(2)
+			if rand.Float64() > random_threshold {
+				temp[idx] = 0
+			} else {
+				temp[idx] = 1
+			}
 		}
 		result = append(result, temp)
 	}
@@ -25,19 +38,15 @@ func Render(random_state [][]int) {
 		for i := 0; i < len(elem); i++ {
 			// if it's dead literally do nothing
 			if elem[i] == 0 {
-				row = append(row, "")
+				row = append(row, " ")
 			} else if elem[i] == 1 {
-				/*
-					eventually want to print out hashtags between the range of 1 and 3
-					but for now just print 2 to make sure it works for debugging case
-				*/
-				randomNumberOfTimes := rand.Intn(4)
-				toPrint := strings.Repeat("#", randomNumberOfTimes)
+				toPrint := strings.Repeat("*", 1)
 				row = append(row, toPrint)
 			}
 		}
 		result = append(result, row)
 	}
+	Clear_Console()
 	for _, elem := range result {
 		fmt.Println(elem)
 	}
@@ -47,10 +56,10 @@ func Render(random_state [][]int) {
 assumptions:
  1. All matrices will be square matrices
 */
-func Next_Board_State(initial_board [][]int) {
+func Next_Board_State(initial_board [][]int) [][]int {
 	rows := len(initial_board)
 	cols := len(initial_board[0])
-	result := [][]int{}
+	result := make([][]int, rows)
 	copy(result, initial_board)
 
 	/*
@@ -109,16 +118,31 @@ func Next_Board_State(initial_board [][]int) {
 			for _, elem := range temp_arr {
 				count += elem
 			}
-			fmt.Printf("The number of live cells is %d\n", count)
+			// fmt.Printf("The number of live cells is %d\n", count)
+
+			// implement the rules
+			if initial_board[i][j] == 1 && (count == 0 || count == 1) {
+				result[i][j] = 0
+			} else if initial_board[i][j] == 1 && count == 2 || count == 3 {
+				result[i][j] = 1
+			} else if initial_board[i][j] == 1 && count > 3 {
+				result[i][j] = 0
+			} else if (initial_board[i][j] == 0) && (count == 3) {
+				result[i][j] = 1
+			}
 		}
 	}
+	return result
 }
 
 func main() {
-	tt := Random_State(3, 3)
-	// Render(tt)
-	for _, elem := range tt {
-		fmt.Println(elem)
+
+	starting_state := Random_State(50, 50)
+	next_state := Next_Board_State(starting_state)
+
+	for {
+		Render(next_state)
+		time.Sleep(1000 * time.Millisecond)
+		next_state = Next_Board_State(next_state)
 	}
-	Next_Board_State(tt)
 }
