@@ -9,21 +9,23 @@ import (
 	"time"
 )
 
+// clear the console on every render cycle to create a frame changing illusion
 func Clear_Console() {
 	cmd := exec.Command("clear")
 	cmd.Stdout = os.Stdout
 	cmd.Run()
 }
+
 func Random_State(width, height int) [][]int {
 	result := [][]int{}
 	random_threshold := 0.3
 	for i := 0; i < height; i++ {
 		temp := make([]int, width)
 		for idx := range temp {
-			if rand.Float64() > random_threshold {
-				temp[idx] = 0
-			} else {
+			if rand.Float64() >= random_threshold {
 				temp[idx] = 1
+			} else {
+				temp[idx] = 0
 			}
 		}
 		result = append(result, temp)
@@ -40,12 +42,12 @@ func Render(random_state [][]int) {
 			if elem[i] == 0 {
 				row = append(row, " ")
 			} else if elem[i] == 1 {
-				toPrint := strings.Repeat("*", 1)
-				row = append(row, toPrint)
+				row = append(row, "*")
 			}
 		}
 		result = append(result, row)
 	}
+
 	Clear_Console()
 	for _, elem := range result {
 		fmt.Println(strings.Join(elem, " "))
@@ -61,13 +63,6 @@ func Next_Board_State(initial_board [][]int) [][]int {
 	cols := len(initial_board[0])
 	result := make([][]int, rows)
 	copy(result, initial_board)
-
-	/*
-		TODO:
-			2. Make sure not to confuse rows with columns. Look closely when one increases and not
-			3. Take my time to write the code
-			4. Implement tests!
-	*/
 
 	for i := 0; i < rows; i++ {
 		for j := 0; j < cols; j++ {
@@ -137,12 +132,12 @@ func Next_Board_State(initial_board [][]int) [][]int {
 
 func main() {
 
-	starting_state := Random_State(50, 50)
+	starting_state := Random_State(20, 20)
 	next_state := Next_Board_State(starting_state)
 
 	for {
 		Render(next_state)
-		time.Sleep(700 * time.Millisecond)
+		time.Sleep(600 * time.Millisecond)
 		next_state = Next_Board_State(next_state)
 	}
 }
