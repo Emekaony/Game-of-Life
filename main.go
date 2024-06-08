@@ -16,7 +16,7 @@ func Clear_Console() {
 }
 func Random_State(width, height int) [][]int {
 	result := [][]int{}
-	random_threshold := 0.1
+	random_threshold := 0.2
 	for i := 0; i < height; i++ {
 		temp := make([]int, width)
 		for idx := range temp {
@@ -48,7 +48,7 @@ func Render(random_state [][]int) {
 	}
 	Clear_Console()
 	for _, elem := range result {
-		fmt.Println(elem)
+		fmt.Println(strings.Join(elem, " "))
 	}
 }
 
@@ -142,7 +142,7 @@ func main() {
 
 	for {
 		Render(next_state)
-		time.Sleep(1000 * time.Millisecond)
+		time.Sleep(700 * time.Millisecond)
 		next_state = Next_Board_State(next_state)
 	}
 }
