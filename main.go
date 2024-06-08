@@ -16,7 +16,7 @@ func Clear_Console() {
 }
 func Random_State(width, height int) [][]int {
 	result := [][]int{}
-	random_threshold := 0.2
+	random_threshold := 0.3
 	for i := 0; i < height; i++ {
 		temp := make([]int, width)
 		for idx := range temp {
